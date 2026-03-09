@@ -30,6 +30,9 @@ public class PaymentVoucherTest {
     PaymentServiceImpl paymentService;
 
     @Mock
+    PaymentVoucher paymentVoucher;
+
+    @Mock
     PaymentRepository paymentRepository;
 
     @Mock
@@ -56,7 +59,7 @@ public class PaymentVoucherTest {
 
     @Test
     void testAddPaymentWithValidVoucherCodeShouldSetStatusSuccess() {
-        Map<String, String> paymentData = paymentDataWithVoucher("ESHOP1234ABC5678");
+        Map<String, String> paymentData = paymentVoucher.paymentDataWithVoucher("ESHOP1234ABC5678");
         Payment result = createVoucherPaymentAndSetStatus(paymentData);
 
         assertEquals("SUCCESS", result.getStatus());
@@ -66,7 +69,7 @@ public class PaymentVoucherTest {
 
     @Test
     void testAddPaymentWithVoucherCodeLengthNot16ShouldSetStatusFailed() {
-        Map<String, String> paymentData = paymentDataWithVoucher("ESHOP1234ABC567");
+        Map<String, String> paymentData = paymentVoucher.paymentDataWithVoucher("ESHOP1234ABC567");
         Payment result = createVoucherPaymentAndSetStatus(paymentData);
 
         assertEquals("FAILED", result.getStatus());
@@ -74,7 +77,7 @@ public class PaymentVoucherTest {
 
     @Test
     void testAddPaymentWithVoucherCodeNotStartingWithEshopShouldSetStatusFailed() {
-        Map<String, String> paymentData = paymentDataWithVoucher("TOKO1234ABC5678");
+        Map<String, String> paymentData = paymentVoucher.paymentDataWithVoucher("TOKO1234ABC5678");
         Payment result = createVoucherPaymentAndSetStatus(paymentData);
 
         assertEquals("FAILED", result.getStatus());
@@ -82,17 +85,13 @@ public class PaymentVoucherTest {
 
     @Test
     void testAddPaymentWithVoucherCodeNumericCharsNot8ShouldSetStatusFailed() {
-        Map<String, String> paymentData = paymentDataWithVoucher("ESHOP12ABCD345678");
+        Map<String, String> paymentData = paymentVoucher.paymentDataWithVoucher("ESHOP12ABCD345678");
         Payment result = createVoucherPaymentAndSetStatus(paymentData);
 
         assertEquals("FAILED", result.getStatus());
     }
 
-    private Map<String, String> paymentDataWithVoucher(String voucherCode) {
-        Map<String, String> paymentData = new HashMap<>();
-        paymentData.put("voucherCode", voucherCode);
-        return paymentData;
-    }
+
 
     private Payment createVoucherPaymentAndSetStatus(Map<String, String> paymentData) {
         doReturn(order).when(orderRepository).findById(order.getId());
@@ -100,16 +99,9 @@ public class PaymentVoucherTest {
                 .when(paymentRepository).save(any(Payment.class));
 
         Payment createdPayment = paymentService.addPayment(order, "Voucher Code", paymentData);
-        String normalizedStatus = isValidVoucher(paymentData.get("voucherCode")) ? "SUCCESS" : "REJECTED";
+        String normalizedStatus = paymentVoucher.isValidVoucher(paymentData.get("voucherCode")) ? "SUCCESS" : "REJECTED";
         return paymentService.setStatus(createdPayment, normalizedStatus);
     }
 
-    private boolean isValidVoucher(String voucherCode) {
-        if (voucherCode == null || voucherCode.length() != 16 || !voucherCode.startsWith("ESHOP")) {
-            return false;
-        }
 
-        long digitCount = voucherCode.chars().filter(Character::isDigit).count();
-        return digitCount == 8;
-    }
 }
