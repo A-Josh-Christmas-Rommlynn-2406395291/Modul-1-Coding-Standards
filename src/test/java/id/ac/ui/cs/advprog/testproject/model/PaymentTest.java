@@ -15,9 +15,9 @@ class PaymentTest {
     @BeforeEach
     void setUp() {
         paymentData = new HashMap<>();
-        paymentData.put("bank", "TESTIBANK");
-        paymentData.put("accountNumber", "1234567890");
-        payment = new Payment("13652556-012a-4c07-b546-54eb1396d79b", "BANK_TRANSFER", paymentData);
+        paymentData.put("Jalan Mock", "10000");
+        paymentData.put("Jalan Escapia", "30000");
+        payment = new Payment("13652556-012a-4c07-b546-54eb1396d79b", "Cash On Delivery", paymentData);
 
 
     }
@@ -29,7 +29,7 @@ class PaymentTest {
 
     @Test
     void testGetMethod() {
-        assertEquals("BANK_TRANSFER", payment.getMethod());
+        assertEquals("Cash On Delivery", payment.getMethod());
     }
 
     @Test
@@ -40,8 +40,8 @@ class PaymentTest {
     @Test
     void testGetPaymentData() {
         assertEquals(2, payment.getPaymentData().size());
-        assertEquals("TESTIBANK", payment.getPaymentData().get("bank"));
-        assertEquals("1234567890", payment.getPaymentData().get("accountNumber"));
+        assertEquals("10000", payment.getPaymentData().get("Jalan Mock"));
+        assertEquals("30000", payment.getPaymentData().get("Jalan Escapia"));
     }
 
     @Test
@@ -51,7 +51,7 @@ class PaymentTest {
 
     @Test
     void testGetMethodNegativeScenario() {
-        assertNotEquals("CREDIT_CARD", payment.getMethod());
+        assertNotEquals("BANK TRANSFER", payment.getMethod());
     }
 
     @Test
@@ -62,12 +62,12 @@ class PaymentTest {
     @Test
     void testSetPaymentDataCanOverwriteValue() {
         Map<String, String> newPaymentData = new HashMap<>();
-        newPaymentData.put("wallet", "MockPay");
+        newPaymentData.put("Jalan Dipomockia", "10000");
 
         payment.setPaymentData(newPaymentData);
 
         assertEquals(1, payment.getPaymentData().size());
-        assertEquals("MockPay", payment.getPaymentData().get("wallet"));
+        assertEquals("10000", payment.getPaymentData().get("Jalan Dipomockia"));
     }
 
     @Test
@@ -76,7 +76,7 @@ class PaymentTest {
 
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> new Payment("13652556-012a-4c07-b546-54eb1396d79b", "BANK_TRANSFER", emptyPaymentData)
+                () -> new Payment("13652556-012a-4c07-b546-54eb1396d79b", "Cash on Delivery", emptyPaymentData)
         );
 
         assertEquals("Payment data is empty", exception.getMessage());

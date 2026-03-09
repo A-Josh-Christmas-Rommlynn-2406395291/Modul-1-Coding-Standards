@@ -16,7 +16,11 @@ public class Payment {
     @Getter @Setter
     private Map<String, String> paymentData;
 
-    Payment(String id, String method, Map<String, String> paymentData) {
+    Payment() {
+
+    }
+
+    public Payment(String id, String method, Map<String, String> paymentData) {
         this.id = id;
         this.method = method;
         this.status = PaymentStatus.PENDING.getValue();
